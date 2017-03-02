@@ -1,21 +1,19 @@
 from BucketListAPI import db
-from datetime import datetime
+from sqlalchemy.dialects.postgresql import JSON
 
 
-class Bookmark(db.Model):
+class Result(db.Model):
+    __tablename__ = 'results'
+
     id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(db.String(300), nullable=False)
-    date = db.Column(db.DateTime, default=datetime.utcnow)
-    description = db.Column(db.String(300))
+    url = db.Column(db.String())
+    result_all = db.Column(JSON)
+    result_no_stop_words = db.Column(JSON)
+
+    def __init__(self, url, result_all, result_no_stop_words):
+        self.url = url
+        self.result_all = result_all
+        self.result_no_stop_words = result_no_stop_words
 
     def __repr__(self):
-        return "<Bookmark '{}': '{}' >".format(self.description, self.url)
-
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True)
-    email = db.Column(db.String(100), unique=True)
-
-    def __repr__(self):
-        return "<User {} >".format(self.username)
+        return '<id {}>'.format(self.id)
