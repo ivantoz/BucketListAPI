@@ -23,7 +23,7 @@ auth = HTTPBasicAuth()
 class BucketListCollection(Resource):
 
     # @auth.login_required
-    @api.marshal_list_with(bucketlist)
+    @api.marshal_list_with(bucketlist_with_items)
     def get(self):
         """
         List all the created bucket list.
@@ -51,7 +51,7 @@ class BucketList(Resource):
         """
         Get single bucket list.
         """
-        return BucketList.query.filter(BucketList.id == id).one()
+        return Bucketlist.query.filter(Bucketlist.id == id).one()
 
     @api.expect(bucketlist)
     @api.response(204, 'Bucketlist item successfully updated.')
@@ -101,12 +101,12 @@ class BucketlistItem(Resource):
         update_item(id, item_id, data)
         return None, 204
 
-    @api.response(204, 'Post successfully deleted.')
+    @api.response(204, 'Item successfully deleted.')
     def delete(self,id, item_id):
         """
         Delete an item in a bucket list.
         """
-        delete_item(id, item_id)
+        delete_item(item_id)
         return None, 204
 
 
