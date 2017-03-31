@@ -16,6 +16,7 @@ class Config(object):
     ERROR_404_HELP = False
 
 
+
 class ProductionConfig(Config):
     DEBUG = False
 
