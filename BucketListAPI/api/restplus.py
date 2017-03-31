@@ -9,7 +9,7 @@ from flask import current_app
 log = logging.getLogger(__name__)
 
 api = Api(version='1.0', title='BucketList Application API',
-          description='API for an online Bucket List service')
+          description='API for an online Bucket List service', validate=True)
 
 
 @api.errorhandler
