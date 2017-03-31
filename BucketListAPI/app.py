@@ -1,16 +1,17 @@
 import logging.config
+import os
 
 from flask import Flask, Blueprint
-import os
+
+from BucketListAPI.api.bucketlists.endpoints.bucketlist import ns as bucketlist_namespace
+from BucketListAPI.api.bucketlists.endpoints.items import ns as bucketlist_item_namespace
 from BucketListAPI.api.restplus import api
-from flask_sqlalchemy import SQLAlchemy
+from BucketListAPI.model import db
 
 
 app = Flask(__name__)
-logging.config.fileConfig('logging.cong')
+logging.config.fileConfig('logging.conf')
 log = logging.getLogger(__name__)
-
-db = SQLAlchemy()
 
 
 def configure_app(flask_app):
@@ -20,18 +21,20 @@ def configure_app(flask_app):
 def initialize_app(flask_app):
     configure_app(flask_app)
 
-    blueprint = Blueprint('api', __name__, url_prefix='/api')
+    blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
     api.init_app(blueprint)
+    api.add_namespace(bucketlist_namespace)
+    api.add_namespace(bucketlist_item_namespace)
     flask_app.register_blueprint(blueprint)
     db.init_app(flask_app)
 
 
 def main():
     initialize_app(app)
-    log.info('>>>>> Starting development server at http://{}/api/ <<<<<'.format(
+    log.info('>>>>> Starting development server at http://{}/api/v1/ <<<<<'.format(
         app.config['SERVER_NAME']))
     app.run(debug=app.config['DEBUG'])
 
 
 if __name__ == '__main__':
-    app.run()
+    main()
