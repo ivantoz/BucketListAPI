@@ -1,12 +1,16 @@
 from flask_restplus import fields
-from BucketList.api.restplus import api
+from BucketListAPI.api.restplus import api
 
 bucketlist_item = api.model('Bucketlist Item', {
-    'id': fields.Integer(readOnly=True, description='The unique identifier of a bucketlist item'),
     'name': fields.String(required=True, description='Bucketlist item name'),
     'date_created': fields.DateTime,
-    'bucketlist_id': fields.Integer(attribute='bucketlist.id'),
-    'done': fields.Boolean(required=True),
+    'done': fields.Boolean(required=True)
+})
+
+bucketlist_item_output = api.inherit('Bucketlist item output', bucketlist_item, {
+    'id': fields.Integer(readOnly=True, description='The unique identifier of a Bucketlist item'),
+    'date_modified': fields.DateTime(description='date modified')
+
 })
 
 pagination = api.model('A page of results', {
@@ -21,12 +25,16 @@ page_of_bucketlist_item = api.inherit('Page of bucketlis item', pagination, {
 })
 
 bucketlist = api.model('Bucketlist', {
-    'id': fields.Integer(readOnly=True, description='The unique identifier of a Bucketlist'),
+    'id': fields.Integer(readOnly=True, nullable=False, description='The unique identifier of a '
+                                                            'Bucketlist'),
     'name': fields.String(required=True, description='Bucketlist name'),
     'date_created': fields.DateTime,
     'created_by': fields.Integer(required=True)
+
 })
 
 bucketlist_with_items = api.inherit('Bucketlist with items', bucketlist, {
-    'items': fields.List(fields.Nested(bucketlist_item))
+    'items': fields.List(fields.Nested(bucketlist_item_output)),
+    'date_modified': fields.DateTime
+
 })
