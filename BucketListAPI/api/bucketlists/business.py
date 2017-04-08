@@ -1,7 +1,6 @@
 from BucketListAPI.model import db
 from BucketListAPI.model import Bucketlist, BucketListItem
 from flask import abort
-from flask_sqlalchemy import BaseQuery
 
 
 def create_bucketlist_item(id, data):
