@@ -28,7 +28,6 @@ class UserLogin(Resource):
 @ns.route('/status')
 class UserCollection(Resource):
     @api.response(200, 'User authorized.')
-    # @api.expect(authorization_arguments, validate=True)
     @auth_required
     def get(self):
         """
@@ -55,14 +54,11 @@ class UserRegister(Resource):
 @ns.route('/logout')
 class UserLogout(Resource):
     @api.response(200, 'Successfully logged out')
-    # @api.expect(authorization_arguments, validate=True)
     @auth_required
     def post(self):
         """
         Logout user using token provided.
         """
-        # args = authorization_arguments.parse_args(request)
-        # auth_header = args.get('Authorization')
         token = request.headers['X-API-TOKEN']
         auth_header = 'Bearer ' + token
         return logout(auth_header)
