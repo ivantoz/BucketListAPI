@@ -3,7 +3,6 @@ from flask import request
 from flask_restplus import Resource
 from BucketListAPI.api.auth.serializers import login
 from BucketListAPI.api.restplus import api
-from BucketListAPI.api.auth.parsers import authorization_arguments
 from BucketListAPI.api.auth.business import create_user, auth_status, logout, login_user
 from BucketListAPI.api.auth.serializers import new_user
 from BucketListAPI.api.restplus import auth_required
