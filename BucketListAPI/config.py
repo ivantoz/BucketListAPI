@@ -4,6 +4,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
     DEBUG = False
+    BCRYPT_LOG_ROUNDS = 13
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -14,7 +15,13 @@ class Config(object):
     RESTPLUS_VALIDATE = True
     RESTPLUS_MASK_SWAGGER = False
     ERROR_404_HELP = False
-
+    MAIL_SERVER = 'smtp.googlemail.com'
+    MAIL_PORT = 465
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = True
+    MAIL_USERNAME = os.environ.get('APP_MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('APP_MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = 'from@example.com'
 
 
 class ProductionConfig(Config):
