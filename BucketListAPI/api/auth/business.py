@@ -40,7 +40,8 @@ def login_user(data):
         from BucketListAPI.app import bcrypt
         # fetch the user data
         user = User.query.filter_by(email=data.get('email')).first()
-        if user and bcrypt.check_password_hash(user.password, data.get('password')):
+        if user and bcrypt.check_password_hash(user.password, data.get('password')
+):
             auth_token = user.encode_auth_token(user.id)
             if auth_token:
                 responseObject = {
