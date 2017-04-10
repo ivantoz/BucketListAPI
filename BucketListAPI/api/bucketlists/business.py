@@ -1,6 +1,6 @@
 from BucketListAPI.model import db
 from BucketListAPI.model import Bucketlist, BucketListItem
-from flask import abort
+from flask import abort, current_app, _app_ctx_stack
 
 
 def create_bucketlist_item(id, data):
@@ -21,25 +21,39 @@ def create_bucketlist_item(id, data):
 
 
 def update_item(id, item_id, data):
-    item = BucketListItem.query.get_or_404(item_id)
     name = data.get('name')
     if not name.strip():
         abort(400, {"errors": {"name": "'name' is a required property"},
                     "message": "Input payload validation failed"})
-    item.name = name
-    item.done = data.get('done')
-    db.session.add(item)
-    db.session.commit()
-    responseObject = {
-        'status': 'success',
-        'message': 'Bucketlist item successfully updated.'
-    }
-    return responseObject
+    with current_app.app_context():
+        user_data = _app_ctx_stack.user_data
+        created_by = user_data['user_id']
+    try:
+        item = Bucketlist.query.filter_by(
+                    created_by=created_by, id=id).first().items.filter_by(id=item_id).first_or_404()
+
+        item.name = name
+        item.done = data.get('done')
+        db.session.add(item)
+        db.session.commit()
+        responseObject = {
+            'status': 'success',
+            'message': 'Bucketlist item successfully updated.'
+        }
+        return responseObject
+    except Exception:
+        abort(400)
 
 
-def delete_item(item_id):
-    item = BucketListItem.query.get_or_404(item_id)
-    db.session.delete(item)
+def delete_item(id, item_id):
+    with current_app.app_context():
+        user_data = _app_ctx_stack.user_data
+        created_by = user_data['user_id']
+    item = Bucketlist.query.filter_by(
+        created_by=created_by, id=id).first().items.filter_by(id=item_id)
+    if not item.count():
+        abort(403)
+    db.session.delete(item.first_or_404())
     db.session.commit()
     responseObject = {
         'status': 'success',
@@ -53,9 +67,10 @@ def create_bucketlist(data):
     if not name.strip():
         abort(400, {"errors": {"name": "'name' is a required property"},
                     "message": "Input payload validation failed"})
-    created_by = data.get('created_by')
+    with current_app.app_context():
+        user_data = _app_ctx_stack.user_data
+        created_by = user_data['user_id']
     bucketlist = Bucketlist(name, created_by)
-
     db.session.add(bucketlist)
     db.session.commit()
     responseObject = {
@@ -70,7 +85,10 @@ def update_bucketlist(bucketlist_id, data):
     if not name.strip():
         abort(400, {"errors": {"name": "'name' is a required property"},
                     "message": "Input payload validation failed"})
-    bucketlist = Bucketlist.query.get_or_404(bucketlist_id)
+    with current_app.app_context():
+        user_data = _app_ctx_stack.user_data
+        created_by = user_data['user_id']
+    bucketlist = Bucketlist.query.filter_by(created_by=created_by, id=bucketlist_id).first_or_404()
     bucketlist.name = name
     db.session.add(bucketlist)
     db.session.commit()
@@ -82,8 +100,13 @@ def update_bucketlist(bucketlist_id, data):
 
 
 def delete_bucketlist(b_id):
-    bucketlist = Bucketlist.query.get_or_404(b_id)
-    db.session.delete(bucketlist)
+    with current_app.app_context():
+        user_data = _app_ctx_stack.user_data
+        created_by = user_data['user_id']
+    bucketlist = Bucketlist.query.filter_by(created_by=created_by, id=b_id)
+    if not bucketlist.count():
+        abort(403)
+    db.session.delete(bucketlist.first_or_404())
     db.session.commit()
     responseObject = {
         'status': 'success',
