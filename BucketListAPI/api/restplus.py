@@ -2,9 +2,7 @@ import logging
 import traceback
 from flask_restplus import Api
 from sqlalchemy.orm.exc import NoResultFound
-from flask import current_app
-from flask import request, json, g, abort, current_app
-import requests
+from flask import request, json, g, abort, current_app, _app_ctx_stack
 from functools import wraps
 
 
@@ -39,9 +37,9 @@ def auth_required(func):
         status_code = resjson[-1]
         data = resjson[0]
         if data['status'] == 'success':
-            # with current_app.app_context():
-            #     g.user_data = data['data']
-            # # import pdb;pdb.set_trace()
+            with current_app.app_context():
+                ctxapp = _app_ctx_stack
+                ctxapp.user_data = data['data']
             return func(*args, **kwargs)
 
         responseObject = {
