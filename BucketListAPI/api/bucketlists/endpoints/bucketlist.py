@@ -12,6 +12,7 @@ from BucketListAPI.api.restplus import api
 from BucketListAPI.model import Bucketlist
 from BucketListAPI.api.bucketlists.parsers import pagination_arguments
 from BucketListAPI.api.restplus import auth_required
+from flask import abort, current_app, _app_ctx_stack
 
 
 log = logging.getLogger(__name__)
@@ -32,7 +33,9 @@ class BucketListCollection(Resource):
         args = pagination_arguments.parse_args(request)
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)
-        bucketlist_query = Bucketlist.query
+        with current_app.app_context():
+            user_data = _app_ctx_stack.user_data
+            bucketlist_query = Bucketlist.query.filter_by(created_by=user_data['user_id'])
         bucketlists = bucketlist_query.paginate(page, per_page, error_out=False)
         return bucketlists
 
@@ -62,16 +65,24 @@ class BucketList(Resource):
         args = pagination_arguments.parse_args(request)
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)
-        bucketlist_query = Bucketlist.query.get_or_404(id)
-        bucketlist_items_query = Bucketlist.query.filter(Bucketlist.id == id)
-        bucketlist_items = bucketlist_items_query[0].items
-        bucketlist_items_paginated = bucketlist_items.paginate(page, per_page, error_out=False)
-        bucketlist_items_paginated.date_modified = bucketlist_query.date_modified
-        bucketlist_items_paginated.created_by = bucketlist_query.created_by
-        bucketlist_items_paginated.id = bucketlist_query.id
-        bucketlist_items_paginated.date_created = bucketlist_query.date_created
-        bucketlist_items_paginated.name = bucketlist_query.name
-        return bucketlist_items_paginated
+        with current_app.app_context():
+            user_data = _app_ctx_stack.user_data
+            created_by = user_data['user_id']
+        try:
+            bucketlist_query = Bucketlist.query.filter_by(created_by=created_by, id=id)
+            if not bucketlist_query.count():
+                abort(404)
+            bucketlist_items = bucketlist_query[0].items
+            bucketlist_items_paginated = bucketlist_items.paginate(page, per_page, error_out=False)
+            bucketlist_items_paginated.date_modified = bucketlist_query[0].date_modified
+            bucketlist_items_paginated.created_by = bucketlist_query[0].created_by
+            bucketlist_items_paginated.id = bucketlist_query[0].id
+            bucketlist_items_paginated.date_created = bucketlist_query[0].date_created
+            bucketlist_items_paginated.name = bucketlist_query[0].name
+            return bucketlist_items_paginated
+        except Exception as e:
+            abort(404, str(e))
+
 
     @api.expect(bucketlist)
     @api.response(204, 'Bucketlist item successfully updated.')
@@ -111,7 +122,7 @@ class BucketlistItemsCollection(Resource):
         return create_bucketlist_item(id, request.json), 201
 
 
-@ns.route('<int:id>/item/<int:item_id>')
+@ns.route('/<int:id>/item/<int:item_id>')
 @api.param('item_id', 'Bucketlist Item ID')
 @api.param('id', 'Bucketlist ID')
 @api.response(404, 'Item not found.')
@@ -134,7 +145,7 @@ class BucketlistItem(Resource):
         Delete an item in a bucket list.
         """
 
-        return delete_item(item_id), 204
+        return delete_item(id, item_id), 204
 
 
 
