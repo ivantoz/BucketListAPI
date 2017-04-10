@@ -26,6 +26,8 @@ flask-restplus==0.10.1
 Flask-HTTPAuth
 Flask-Bcrypt
 pyjwt
+Flask-Testing
+
 
 
 
