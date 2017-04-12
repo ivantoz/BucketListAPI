@@ -9,10 +9,6 @@ python:
 service:
   - postgresql
 
-before_install:
-  - export APP_SETTINGS='BucketListAPI.config.TestingConfig"
-  - export SECRET_KEY="justatest"
-  - export TEST_DATABASE_URI="sqlite:///bucketlist_test.sqlite"
 
 install:
   - pip install -r requirements.txt
