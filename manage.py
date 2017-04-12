@@ -20,6 +20,14 @@ COV = coverage.coverage(
     include='BucketListAPI/*',
     omit=[
         'BucketListAPI/tests/*',
+        'BucketListAPI/model.py',
+        'BucketListAPI/api/auth/endpoints/*',
+        'BucketListAPI/api/bucketlists/endpoints/*',
+        'BucketListAPI/api/restplus.py',
+        'BucketListAPI/app.py',
+        'BucketListAPI/model.py'
+
+
     ]
 )
 COV.start()
