@@ -8,8 +8,6 @@ new_user = api.model('User Register', {
     'email': fields.String(description="user email address", example='email@domain.com',
                            required=True, pattern=EMAIL_REGEX),
     'password': fields.String(required=True, description='User password', example='password')
-    # 'first_name': fields.String(required=True, description='User first name', example='John'),
-    # 'last_name': fields.String(required=True, description='User last name', example='Doe')
 })
 
 login = api.model('User Login', {
