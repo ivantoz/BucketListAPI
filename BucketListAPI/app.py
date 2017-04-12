@@ -31,6 +31,7 @@ def initialize_app(flask_app):
     flask_app.register_blueprint(blueprint)
     db.init_app(flask_app)
     mail.init_app(flask_app)
+    return flask_app
 
 
 def main():
