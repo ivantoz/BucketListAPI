@@ -1,6 +1,9 @@
 from BucketListAPI.model import db
 from BucketListAPI.model import Bucketlist, BucketListItem
 from flask import abort, current_app, _app_ctx_stack
+from flask_restplus import marshal
+from BucketListAPI.api.bucketlists.serializers import bucketlist as bucketlist_fields
+from BucketListAPI.api.bucketlists.serializers import bucketlist_item_output
 
 
 def create_bucketlist_item(id, data):
@@ -13,18 +16,19 @@ def create_bucketlist_item(id, data):
         db.session.commit()
         responseObject = {
             'status': 'success',
-            'message': 'Bucketlist item successfully created.'
+            'message': 'Bucketlist item successfully created.',
+            'bucketlist_item': marshal(bucketlist_item, bucketlist_item_output)
         }
         return responseObject
     else:
-        abort(404, {'error': {'message': 'Bucketlist not found'}})
+        abort(404, 'Bucketlist not found')
 
 
 def update_item(id, item_id, data):
     name = data.get('name')
     if not name.strip():
-        abort(400, {"errors": {"name": "'name' is a required property"},
-                    "message": "Input payload validation failed"})
+        abort(400, {"message": "Input payload validation failed",
+                    "field": "'name' is a required property"})
     with current_app.app_context():
         user_data = _app_ctx_stack.user_data
         created_by = user_data['user_id']
@@ -38,7 +42,8 @@ def update_item(id, item_id, data):
         db.session.commit()
         responseObject = {
             'status': 'success',
-            'message': 'Bucketlist item successfully updated.'
+            'message': 'Bucketlist item successfully updated.',
+            'bucketlist_item': marshal(item, bucketlist_item_output )
         }
         return responseObject
     except Exception:
@@ -75,7 +80,8 @@ def create_bucketlist(data):
     db.session.commit()
     responseObject = {
         'status': 'success',
-        'message': 'Bucketlist successfully created.'
+        'message': 'Bucketlist successfully created.',
+        'bucketlist': marshal(bucketlist, bucketlist_fields)
     }
     return responseObject
 
@@ -94,7 +100,8 @@ def update_bucketlist(bucketlist_id, data):
     db.session.commit()
     responseObject = {
         'status': 'success',
-        'message': 'Bucketlist item successfully updated.'
+        'message': 'Bucketlist successfully updated.',
+        'bucketlist': marshal(bucketlist, bucketlist_fields)
     }
     return responseObject
 
