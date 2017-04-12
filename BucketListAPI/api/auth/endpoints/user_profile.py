@@ -41,6 +41,7 @@ class UserCollection(Resource):
 @ns.route('/register')
 class UserRegister(Resource):
 
+    @api.response(202, 'User already exists. Please Log in.')
     @api.response(201, 'User successfully created.')
     @api.expect(new_user)
     def post(self):
@@ -48,7 +49,7 @@ class UserRegister(Resource):
         Create a new User.
         """
         data = request.json
-        return create_user(data), 201
+        return create_user(data)
 
 
 @ns.route('/logout')
