@@ -1,7 +1,5 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
-postgres_local_base = 'postgresql://postgres:@localhost/'
-database_name = 'bucketlist'
 
 
 class Config(object):
@@ -10,7 +8,6 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = os.environ.get('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     FLASK_SERVER_NAME = 'localhost:8000'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SWAGGER_UI_DOC_EXPANSION = 'list'
@@ -26,19 +23,30 @@ class Config(object):
     MAIL_DEFAULT_SENDER = 'from@example.com'
 
 
+
 class ProductionConfig(Config):
     DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    PAYLOAD_EXPIRATION_TIME = 3000
 
 
 class StagingConfig(Config):
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     DEVELOPMENT = True
     DEBUG = True
+    PAYLOAD_EXPIRATION_TIME = 3000
 
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    PAYLOAD_EXPIRATION_TIME = 3000
 
 
 class TestingConfig(Config):
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URI')
+    PRESERVE_CONTEXT_ON_EXCEPTION = False
+    BCRYPT_LOG_ROUNDS = 4
+    PAYLOAD_EXPIRATION_TIME = 5
