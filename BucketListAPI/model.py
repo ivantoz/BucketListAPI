@@ -7,6 +7,7 @@ import jwt
 db = SQLAlchemy()
 
 
+
 class User(db.Model):
     """ User Model for storing user related details """
     __tablename__ = "users"
@@ -36,7 +37,8 @@ class User(db.Model):
         """
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=3000),
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0,
+                                                                       seconds=current_app.config['PAYLOAD_EXPIRATION_TIME']),
                 'iat': datetime.datetime.utcnow(),
                 'sub': user_id
             }
