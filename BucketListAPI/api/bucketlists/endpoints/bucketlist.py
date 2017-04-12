@@ -6,11 +6,11 @@ from flask_restplus import Resource
 from BucketListAPI.api.bucketlists.business import create_bucketlist, delete_bucketlist, \
     update_bucketlist
 from BucketListAPI.api.bucketlists.serializers import bucketlist, \
-    bucketlist_item, page_of_bucketlist, page_of_bucketlist_items
+    bucketlist_item, page_of_bucketlist, page_of_bucketlist_items, bucketlist_input
 from BucketListAPI.api.bucketlists.business import create_bucketlist_item, update_item, delete_item
 from BucketListAPI.api.restplus import api
 from BucketListAPI.model import Bucketlist
-from BucketListAPI.api.bucketlists.parsers import pagination_arguments
+from BucketListAPI.api.bucketlists.parsers import pagination_arguments, search_argument
 from BucketListAPI.api.restplus import auth_required
 from flask import abort, current_app, _app_ctx_stack
 
@@ -23,24 +23,35 @@ ns = api.namespace('bucketlist', description='Operations related to Bucketlist')
 @ns.route('/')
 class BucketListCollection(Resource):
 
-    @api.expect(pagination_arguments)
+    @api.expect(pagination_arguments, search_argument)
     @api.marshal_with(page_of_bucketlist)
     @auth_required
     def get(self):
         """
         List all the created bucket list.
         """
+        search_args = search_argument.parse_args(request)
         args = pagination_arguments.parse_args(request)
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)
+        search_term = search_args.get('q')
         with current_app.app_context():
             user_data = _app_ctx_stack.user_data
+        if search_term:
+            search_query = Bucketlist.query.filter_by(created_by=user_data[
+                'user_id'], name=search_term)
+
+            if search_query.count():
+                bucketlists = search_query.paginate(page, per_page, error_out=False)
+                return bucketlists, 200
+            abort(404, 'bucketlist not found')
+        else:
             bucketlist_query = Bucketlist.query.filter_by(created_by=user_data['user_id'])
-        bucketlists = bucketlist_query.paginate(page, per_page, error_out=False)
-        return bucketlists
+            bucketlists = bucketlist_query.paginate(page, per_page, error_out=False)
+            return bucketlists, 200
 
     @api.response(201, 'Bucketlist successfully created.')
-    @api.expect(bucketlist, validate=True)
+    @api.expect(bucketlist_input, validate=True)
     @auth_required
     def post(self):
         """
@@ -83,8 +94,7 @@ class BucketList(Resource):
         except Exception as e:
             abort(404, str(e))
 
-
-    @api.expect(bucketlist)
+    @api.expect(bucketlist_input)
     @api.response(204, 'Bucketlist item successfully updated.')
     @auth_required
     def put(self, id):
@@ -94,7 +104,7 @@ class BucketList(Resource):
         * Specify the ID of the bucketlist to modify in the request URL path.
         """
         data = request.json
-        return update_bucketlist(id, data), 204
+        return update_bucketlist(id, data), 200
 
     @api.response(204, 'BucketList item successfully deleted.')
     @auth_required
@@ -108,7 +118,7 @@ class BucketList(Resource):
 
 
 @ns.route('/<int:id>/item/')
-@api.param('id', 'Bucketlist ID')
+@api.param('id', 'Bucketlist id')
 @api.response(201, 'Bucketlist item successfully created.')
 class BucketlistItemsCollection(Resource):
 
@@ -129,14 +139,14 @@ class BucketlistItemsCollection(Resource):
 class BucketlistItem(Resource):
 
     @api.expect(bucketlist_item)
-    @api.response(204, 'Item successfully updated.')
+    @api.response(200, 'Item successfully updated.')
     @auth_required
     def put(self, id, item_id):
         """
         Update a bucket list item.
         """
         data = request.json
-        return update_item(id, item_id, data), 204
+        return update_item(id, item_id, data), 200
 
     @api.response(204, 'Item successfully deleted.')
     @auth_required
