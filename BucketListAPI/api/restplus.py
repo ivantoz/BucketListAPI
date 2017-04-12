@@ -2,7 +2,7 @@ import logging
 import traceback
 from flask_restplus import Api
 from sqlalchemy.orm.exc import NoResultFound
-from flask import request, json, g, abort, current_app, _app_ctx_stack
+from flask import request, json, abort, current_app, _app_ctx_stack
 from functools import wraps
 
 
