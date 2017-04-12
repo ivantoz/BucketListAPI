@@ -1,0 +1,30 @@
+language: python
+
+python:
+  - "3.6"
+  - "3.5"
+  - "3.4"
+  - "2.7"
+
+service:
+  - postgresql
+
+before_install:
+  - export APP_SETTINGS='BucketListAPI.config.TestingConfig"
+  - export SECRET_KEY="justatest"
+  - export TEST_DATABASE_URI="sqlite:///bucketlist_test.sqlite"
+
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+
+before_script:
+  - python manage.py db init
+  - python manage.py db migrate
+  - python manage.py db upgrade
+
+script:
+  - python manage.py cov
+
+after_success:
+  coveralls
