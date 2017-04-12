@@ -70,8 +70,8 @@ def delete_item(id, item_id):
 def create_bucketlist(data):
     name = data.get('name')
     if not name.strip():
-        abort(400, {"errors": {"name": "'name' is a required property"},
-                    "message": "Input payload validation failed"})
+        abort(400, {"message": "Input payload validation failed",
+                    "field": "'name' is a required property"})
     with current_app.app_context():
         user_data = _app_ctx_stack.user_data
         created_by = user_data['user_id']
@@ -89,8 +89,8 @@ def create_bucketlist(data):
 def update_bucketlist(bucketlist_id, data):
     name = data.get('name')
     if not name.strip():
-        abort(400, {"errors": {"name": "'name' is a required property"},
-                    "message": "Input payload validation failed"})
+        abort(400, {"message": "Input payload validation failed",
+                    "field": "'name' is a required property"})
     with current_app.app_context():
         user_data = _app_ctx_stack.user_data
         created_by = user_data['user_id']
