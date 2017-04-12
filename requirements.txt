@@ -27,7 +27,7 @@ Flask-HTTPAuth
 Flask-Bcrypt
 pyjwt
 Flask-Testing
-
+coverage
 
 
 
