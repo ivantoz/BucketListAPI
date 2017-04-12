@@ -3,6 +3,7 @@ from flask_testing.utils import _make_test_response
 from flask import Flask
 from BucketListAPI.app import initialize_app
 from BucketListAPI.model import db
+import os
 
 
 class BaseTestCase(TestCase):
@@ -35,6 +36,7 @@ class BaseTestCase(TestCase):
             del self.app
         db.session.remove()
         db.drop_all()
+        os.remove('BucketListAPI/tests/bucketlist_test.sqlite')
 
 
 
