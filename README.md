@@ -48,41 +48,4 @@ dynos on the Heroku platform
 * `runtime.txt` - specifies the python version to run on heroku
 
 
-### Application Structure
 
-```
-BucketListAPI/
-├── requirements.txt
-├── runtime.txt
-├── .gitignore
-├── logging.conf
-├── README.md
-├── manage.py
-├── Procfile
-
-├── __init__.py
-├── extensions
-│   └── __init__.py
-└── modules
-    ├── __init__.py
-    ├── api
-    │   └── __init__.py
-    ├── auth
-    │   ├── __init__.py
-    │   ├── models.py
-    │   ├── parameters.py
-    │   └── views.py
-    ├── users
-    │   ├── __init__.py
-    │   ├── models.py
-    │   ├── parameters.py
-    │   ├── permissions.py
-    │   ├── resources.py
-    │   └── schemas.py
-    └── teams
-        ├── __init__.py
-        ├── models.py
-        ├── parameters.py
-        ├── resources.py
-        └── schemas.py
-```
